@@ -13,6 +13,9 @@ import { Cars } from './collections/Cars'
 import { Manufacturers } from './collections/Manufacturers'
 import { Pages } from './collections/Pages'
 
+import { en } from '@payloadcms/translations/languages/en'
+import { pt } from '@payloadcms/translations/languages/pt'
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -93,4 +96,7 @@ export default buildConfig({
     payloadCloudPlugin(),
     // storage-adapter-placeholder
   ],
+  i18n: { 
+    supportedLanguages: { pt, en },
+  },
 })
