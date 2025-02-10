@@ -1,7 +1,7 @@
 // storage-adapter-import-placeholder
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -9,6 +9,9 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Cars } from './collections/Cars'
+import { Manufacturers } from './collections/Manufacturers'
+import { Pages } from './collections/Pages'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -20,8 +23,64 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
-  editor: lexicalEditor(),
+  collections: [
+    Users, 
+    Media,
+    Cars,
+    Manufacturers,
+    Pages,
+  ],
+  editor: lexicalEditor({
+    features: ({ defaultFeatures, rootFeatures }) => [
+      ...defaultFeatures,
+      BlocksFeature({
+        blocks: [
+          {
+            slug: 'carHighLight',
+            fields: [
+              {
+                name: 'car',
+                type: 'relationship',
+                relationTo: 'cars',
+              },
+              {
+                name: 'type',
+                type: 'radio',
+                defaultValue: 'image',
+                options: [
+                  {
+                    label: 'Image',
+                    value: 'image',
+                  },
+                  {
+                    label: 'Gallery',
+                    value: 'gallery',
+                  },
+                ],
+              }
+            ]
+          }
+        ],
+        inlineBlocks: [
+          {
+            slug: 'carPrice',
+            admin: {
+              components: {
+                Label: '/components/CarPriceLabel',
+              }
+            },
+            fields: [
+              {
+                name: 'car',
+                type: 'relationship',
+                relationTo: 'cars',
+              }
+            ]
+          }
+        ]
+      }),
+    ],
+  }),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
